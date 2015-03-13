@@ -1,9 +1,7 @@
 package ca.shiftfocus.lib.concurrent
 
-import ca.shiftfocus.krispii.core.lib.concurrent.FutureMonad
-
-import _root_.scalaz.{-\/, EitherT, \/, \/-}
-import scala.concurrent.Future
+import scalaz.{-\/, EitherT, \/, \/-}
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * This trait provides several utility functions that can be used with Futures in
@@ -40,7 +38,7 @@ trait Lifting[A] extends FutureMonad with Serialized {
    * @tparam B
    * @return
    */
-  def liftSeq[B](interList: IndexedSeq[Future[\/[A, B]]]): EitherT[Future, A, IndexedSeq[B]] = {
+  def liftSeq[B](interList: IndexedSeq[Future[\/[A, B]]])(implicit ec: ExecutionContext): EitherT[Future, A, IndexedSeq[B]] = {
     liftSeq(Future.sequence(interList))
   }
 
@@ -52,7 +50,7 @@ trait Lifting[A] extends FutureMonad with Serialized {
    * @tparam B
    * @return
    */
-  def liftSeq[B](fIntermediate: Future[IndexedSeq[\/[A, B]]]): EitherT[Future, A, IndexedSeq[B]] = {
+  def liftSeq[B](fIntermediate: Future[IndexedSeq[\/[A, B]]])(implicit ec: ExecutionContext): EitherT[Future, A, IndexedSeq[B]] = {
     val result = fIntermediate.map { intermediate =>
       if (intermediate.filter(_.isLeft).nonEmpty) -\/(intermediate.filter(_.isLeft).head.swap.toOption.get)
       else \/-(intermediate.map(_.toOption.get))
@@ -106,7 +104,7 @@ trait Lifting[A] extends FutureMonad with Serialized {
    * @param fail the failure to return when the condition is false
    * @return a [[scalaz.EitherT]]
    */
-  def predicate(fCondition: Future[Boolean])(fail: A): EitherT[Future, A, Unit] = {
+  def predicate(fCondition: Future[Boolean])(fail: A)(implicit ec: ExecutionContext): EitherT[Future, A, Unit] = {
     lift {
       fCondition.map { condition =>
         if (condition) \/-(())
@@ -135,7 +133,7 @@ trait Lifting[A] extends FutureMonad with Serialized {
    * @tparam L the exact type of list, which must be an indexed sequence
    * @return
    */
-  def serializedT[E, R, L[E] <: IndexedSeq[E]](collection: L[E])(fn: E => Future[\/[A, R]]): Future[\/[A, IndexedSeq[R]]] = {
+  def serializedT[E, R, L[E] <: IndexedSeq[E]](collection: L[E])(fn: E => Future[\/[A, R]])(implicit ec: ExecutionContext): Future[\/[A, IndexedSeq[R]]] = {
     val empty: Future[\/[A, IndexedSeq[R]]] = Future.successful(\/-(IndexedSeq.empty[R]))
     collection.foldLeft(empty) { (fAccumulated, nextItem) =>
       val iteration = for {

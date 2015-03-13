@@ -2,7 +2,7 @@ name := "sflib"
 
 organization := "ca.shiftfocus"
 
-version := "1.0.0"
+version := "1.0.1"
 
 scalaVersion := "2.11.6"
 
@@ -24,10 +24,13 @@ publishTo := {
   ) as ("maven", privateKeyFile))
 }
 
-resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
+resolvers ++= Seq(
+  "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
+  "ShiftFocus repository" at "https://maven.shiftfocus.ca/repositories/releases/"
+)
 
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play" % "2.3.6",
   "org.scalaz" %% "scalaz-core" % "7.1.1",
-  "ca.shiftfocus" %% "uuid" % "1.0.0"
+  "ca.shiftfocus" %% "uuid" % "1.0.1"
 )

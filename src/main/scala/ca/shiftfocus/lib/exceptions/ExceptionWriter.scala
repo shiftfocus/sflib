@@ -1,4 +1,4 @@
-package ca.shiftfocus.krispii.core.lib
+package ca.shiftfocus.lib.exceptions
 
 import java.io.StringWriter
 import java.io.PrintWriter

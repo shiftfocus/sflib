@@ -1,6 +1,6 @@
 package ca.shiftfocus.lib.concurrent
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scalaz.{\/-, \/}
 
 trait Serialized {
@@ -24,7 +24,7 @@ trait Serialized {
    * @tparam L
    * @return
    */
-  def serialized[E, R, L[E] <: IndexedSeq[E]](collection: L[E])(fn: E => Future[R]): Future[IndexedSeq[R]] = {
+  def serialized[E, R, L[E] <: IndexedSeq[E]](collection: L[E])(fn: E => Future[R])(implicit ec: ExecutionContext): Future[IndexedSeq[R]] = {
     collection.foldLeft(Future(IndexedSeq.empty[R])) { (fAccumulated, nextItem) =>
       for {
         accumulated <- fAccumulated

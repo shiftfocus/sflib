@@ -1,4 +1,4 @@
-package ca.shiftfocus.krispii.core.lib.concurrent
+package ca.shiftfocus.lib.concurrent
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

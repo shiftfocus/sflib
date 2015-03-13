@@ -1,4 +1,4 @@
-package ca.shiftfocus.krispii.api.binders
+package ca.shiftfocus.lib.uuid
 
 import ca.shiftfocus.uuid.UUID
 import play.api.mvc.PathBindable
