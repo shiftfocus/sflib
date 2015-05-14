@@ -104,12 +104,20 @@ trait Lifting[A] extends FutureMonad with Serialized {
    * @param fail the failure to return when the condition is false
    * @return a [[scalaz.EitherT]]
    */
-  def predicate(fCondition: Future[Boolean])(fail: A)(implicit ec: ExecutionContext): EitherT[Future, A, Unit] = {
+//  def predicate(fCondition: Future[Boolean])(fail: A)(implicit ec: ExecutionContext): EitherT[Future, A, Unit] = {
+//    lift {
+//      fCondition.map { condition =>
+//        if (condition) \/-(())
+//        else -\/(fail)
+//      }
+//    }
+//  }
+  def predicate(fCondition: Future[\/[A, Boolean]])(fail: A)(implicit ec: ExecutionContext): EitherT[Future, A, Unit] = {
     lift {
-      fCondition.map { condition =>
-        if (condition) \/-(())
-        else -\/(fail)
-      }
+      fCondition.map(_.map {
+        case true => \/-(())
+        case false => -\/(fail)
+      })
     }
   }
 
