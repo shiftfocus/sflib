@@ -1,6 +1,6 @@
 package ca.shiftfocus.lib.concurrent
 
-import scalaz.{-\/, EitherT, \/, \/-}
+import scalaz._
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
@@ -11,6 +11,22 @@ import scala.concurrent.{ExecutionContext, Future}
  *           NB: the left-hand type is invariant in the EitherT transformer.
  */
 trait Lifting[A] extends FutureMonad with Serialized {
+
+  implicit def liftFun[X, T <% X, U](f: (X) => U): (T) => U = {
+    def g(t: T) = f(t)
+    g _
+  }
+
+  class Pipe[T](t: T) {
+    def pipeTo[X, U](f: (X) => U)(implicit ev: T => X) = f(t)
+  }
+  implicit def pipeTo[T](t: T) = new Pipe(t: T)
+
+  type ErrorOr[B] = EitherT[Future, A, B]
+  type ReaderTE[C, B] = ReaderT[ErrorOr, C, B]
+  object ReaderTE extends KleisliInstances with KleisliFunctions {
+    def apply[C, B](f: C => ErrorOr[B]): ReaderTE[C, B] = kleisli[ErrorOr, C, B](f)
+  }
 
   /**
    * An implicit conversion to automatically call ".run" on EitherT monads when
@@ -120,6 +136,31 @@ trait Lifting[A] extends FutureMonad with Serialized {
       })
     }
   }
+
+  /**
+   * Optionally call a function to return a value, depending on whether the optional parameter is defined or not.
+   * If it is not, instead return a default value.
+   *
+   * @param anOption the optional parameter
+   * @param f the function to call with the optional parameter
+   * @param default the default value to return if the optional parameter is not defined
+   * @tparam I the type of the optional parameter
+   * @tparam B the success type returned by f
+   * @return
+   */
+  def optionally[I, B](anOption: Option[I])(f: I => EitherT[Future, A, B])(default: B): EitherT[Future, A, B] = lift {
+    anOption match {
+      case Some(thing) => f(thing)
+      case None => Future successful \/-(default)
+    }
+  }
+
+  def readerOptional[I, C, B](anOption: Option[I])(f: I => ReaderTE[C, B])(default: B): ReaderTE[C, B] = ReaderTE { conn: C => lift {
+    anOption match {
+      case Some(thing) => f(thing)(conn)
+      case None => Future successful \/-(default)
+    }
+  }}
 
   /**
    * Given a collection, and some function to map over the collection whose result type is a future disjunction,

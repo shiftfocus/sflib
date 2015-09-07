@@ -2,7 +2,7 @@ name := "sflib"
 
 organization := "ca.shiftfocus"
 
-version := "1.0.3"
+version := "1.0.7-SNAPSHOT"
 
 scalaVersion := "2.11.6"
 
@@ -30,7 +30,5 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play" % "2.3.6",
-  "org.scalaz" %% "scalaz-core" % "7.1.1",
-  "ca.shiftfocus" %% "uuid" % "1.0.1"
+  "org.scalaz" %% "scalaz-core" % "7.1.2"
 )

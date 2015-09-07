@@ -2,7 +2,6 @@ package ca.shiftfocus.lib.exceptions
 
 import java.io.StringWriter
 import java.io.PrintWriter
-import play.api.Logger
 
 object ExceptionWriter {
   def print(exception: Throwable): String = {
