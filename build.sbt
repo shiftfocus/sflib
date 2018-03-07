@@ -2,7 +2,7 @@ name := "sflib"
 
 organization := "ca.shiftfocus"
 
-version := "1.0.7"
+version := "1.0.8"
 
 scalaVersion := "2.12.4"
 
