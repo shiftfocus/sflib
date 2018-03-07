@@ -24,8 +24,8 @@ trait Lifting[A] extends FutureMonad with Serialized {
 
   type ErrorOr[B] = EitherT[Future, A, B]
   type ReaderTE[C, B] = ReaderT[ErrorOr, C, B]
-  object ReaderTE extends KleisliInstances with KleisliFunctions {
-    def apply[C, B](f: C => ErrorOr[B]): ReaderTE[C, B] = kleisli[ErrorOr, C, B](f)
+  object ReaderTE extends KleisliInstances {
+    def apply[C, B](f: C => ErrorOr[B]): ReaderTE[C, B] = Kleisli[ErrorOr, C, B](f)
   }
 
   /**
