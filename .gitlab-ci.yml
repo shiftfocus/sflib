@@ -1,0 +1,10 @@
+cache:
+    paths:
+        - target/
+
+ci_compile:
+    stage: build
+    tags:
+        - lceeq
+    script:
+        - sbt publishLocal
