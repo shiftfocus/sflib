@@ -26,7 +26,7 @@ publish to maven:
     when: manual
     tags:
         - lceeq
-        - j8
+        - staging
     variables:
         GIT_STRATEGY: none
     script:
