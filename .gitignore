@@ -33,3 +33,9 @@ tmp
 # Scala-IDE specific
 .scala_dependencies
 .worksheet
+**.metals
+**.vscode
+**.bloop
+
+# Mac 
+**.DS_Store

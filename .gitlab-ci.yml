@@ -1,0 +1,46 @@
+aws warmup:
+    stage: .pre
+    variables:
+        GIT_STRATEGY: none
+    tags:
+        - aws
+    script:
+        - aws ec2 start-instances --instance-ids $STAGING_INSTANCE 
+
+compile and build:
+    stage: build
+    tags:
+        - lceeq
+        - staging
+    variables:
+        GIT_STRATEGY: fetch
+    script:
+        - sbt compile
+    cache:
+        paths:
+        - target
+    interruptible: true
+
+publish to maven:
+    stage: deploy
+    when: manual
+    tags:
+        - lceeq
+        - j8
+    variables:
+        GIT_STRATEGY: none
+    script:
+        - sbt publish
+    cache:
+        paths:
+        - target
+
+cleanup:
+    stage: .post
+    when: manual
+    variables:
+        GIT_STRATEGY: none
+    tags:
+        - aws
+    script:
+        - aws ec2 stop-instances --instance-ids $STAGING_J8_INSTANCE $DB_STAGING_INSTANCE
